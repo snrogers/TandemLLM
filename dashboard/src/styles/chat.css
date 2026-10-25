@@ -955,6 +955,8 @@ qse-chat-thread {
   line-height: 1.55;
   max-height: 320px;
   overflow: auto;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 /* markdown: the dashboard's renderer, with a toolbar on the code blocks */
