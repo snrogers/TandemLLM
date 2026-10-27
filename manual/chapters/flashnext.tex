@@ -33,7 +33,7 @@ turboderp publishes Flash-Next in five sizes, one branch each of \code{turboderp
 
 \begin{table}[htbp]
 \centering\small
-\caption[The Flash-Next packs]{The Flash-Next packs on one DGX Spark. Weights: the GiB on the device, the draft layer and the int8 mixers included; \measured{} for 3.05, estimated from the file sizes for the others.}\label{tab:fn-packs}
+\caption[The Flash-Next packs]{The Flash-Next packs on one DGX Spark. Weights: the GiB on the device, the draft layer and the int8 mixers included; \measured{} for 3.05 and for the uncensored 4.05, estimated from the file sizes for the others.}\label{tab:fn-packs}
 \begin{tabularx}{\linewidth}{@{}L{.17\linewidth}L{.1\linewidth}L{.13\linewidth}L{.18\linewidth}Y@{}}
 \toprule
 \hd{profile} & \hd{disk} & \hd{weights} & \hd{n-gram table} & \hd{largest window} \\
@@ -41,6 +41,7 @@ turboderp publishes Flash-Next in five sizes, one branch each of \code{turboderp
 \code{flashnext-2.05} & 61.5~GB & 32.85~GiB & 24.44~GiB, warm & 262,144 \\
 \code{flashnext-3.05} & 85.1~GB & 47.87~GiB & 30.4~GiB, cold & 262,144 (recommended profile) \\
 \code{flashnext-4.05} & 106.1~GB & 62.47~GiB & 36.36~GiB, cold & 208,896 \\
+\code{flashnext-unc-4.05} & 109.1~GB & 63.88~GiB & 36.36~GiB, cold & 131,072 \\
 \code{flashnext-5.05} & 121.9~GB & 77.16~GiB & 36.36~GiB, cold & does not load yet \\
 \code{flashnext-6.05} & 137.7~GB & 91.87~GiB & 36.36~GiB, cold & none: it does not fit \\
 \bottomrule
@@ -70,6 +71,8 @@ One request of 260,800 tokens through the server, on each of the three packs tha
 The run also measured what a long prefill takes: 571~tok/s for the 260,800-token request on 3.05, 261,549 rows with the conductor's notes (585 on 2.05 and 581 on 4.05), and a prefill workspace of 10.47~GiB above the engine, which stops growing at about 140k tokens. Decoding at that length, with the prompt from the caches, 3.05 made 22.5~tok/s with the drafter at 2.0 tokens a block; 2.05 made 27.0 and 4.05 20.5 (\measured, one run each). A server without a drafter decoded 36.6~tok/s at that length (one request), and Section~\ref{sec:fn-plain} says what changed.
 
 Two packs do not run. 5.05 codes its routed experts at 5 and 7 bits, and the MoE kernels take 2 to 6 and 8, so its load stops at the expert bank. 6.05 needs about 92~GiB for its weights, which leaves too little under the 15~GiB floor at any window. 3.05 reads its n-gram table cold. Warm, with the whole table resident, MemAvailable less the table fell to 8.4~GiB during a 146,400-token request at a 147,456-token window, under the floor.
+
+A sixth profile is not turboderp's: \code{flashnext-unc-4.05} serves Lygodactylus's EXL3 pack of orcarouter's abliterated (uncensored) build of the model, a repository of its own at a pinned commit (109.1~GB of files, about 102~GiB on disk). As published it does not load: its vision tower is unquantized (16-bit) with a pre-fused qkv, and the loader builds the tower from EXL3 blocks. \code{tools/fn_tower_quantize.py} quantizes the tower at 5~bpw, the converter's own uncalibrated treatment for a vision tower, and writes it as one sidecar file, \code{vision_tower_exl3.safetensors}, in the pack folder; the loader reads it through its \code{vision_*.safetensors} rule, over the shards, and deleting the sidecar puts the pack back as published. Its window in the table is the one it was run at on a DGX Spark (2026-10-27, its weights \measured{} at load); the estimate was not run for this pack.
 
 \section{Loading}
 

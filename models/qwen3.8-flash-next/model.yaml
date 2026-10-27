@@ -1,6 +1,7 @@
 # Qwen3.8-Flash-Next in TandemLLM: the setup guide's registry entry (docs/setup.md, OPS-97). Schema 1.
 #
-# turboderp's EXL3 packs, one profile each (ops/profiles/flashnext-<bpw>.env). weights_gib: the weights
+# turboderp's EXL3 packs, one profile each (ops/profiles/flashnext-<bpw>.env), and one community pack
+# of the uncensored build (flashnext-unc-4.05). weights_gib: the weights
 # with the draft layer and the int8 mixers on the device (3.05 measured: load stage `weights`, 2026-10-12
 # with the mixers' scale a group of 128 weights; the others from their file sizes, 2026-10-11, plus the
 # group scales' 0.02 GiB); disk_gb: the pack with its n-gram table (3.05 measured,
@@ -175,6 +176,39 @@ profiles:
   note: 'Its table is read past the page cache (cold): weights and a warm table do not fit together.'
   hf_revision: 4.05bpw_h6_ng6
   max_window: 208896
+  table:
+    gib: 36.36
+    policy: cold
+    cache_gib: 2.0
+- id: flashnext-unc-4.05
+  label: EXL3 4.05 bpw (Lygodactylus, uncensored)
+  format: exl3
+  bpw: 4.05
+  disk_gb: 109.1
+  weights_gib: 63.88
+  drafters_gib: 0.0
+  hf_repo: Lygodactylus/Qwen3.8-Flash-Next-Uncensored-exl3-4bpw
+  hf_private: false
+  made_by: {kind: community, name: Lygodactylus, github: Lygodactylus}
+  recommended: false
+  badges:
+  - uncensored
+  quality:
+    kl_vs_bf16: null
+    top1_pct: null
+    ppl: null
+    date: '2026-10-27'
+    source: 'not measured: no BF16 reference run for this pack; it loaded and served on a DGX Spark on
+      2026-10-27, its quantized tower answering an image question as the 3.05 pack did'
+  assets_required: []
+  note: 'Lygodactylus''s EXL3 pack of orcarouter''s abliterated (uncensored) build of the model. As
+    published its vision tower is unquantized (16-bit) with a pre-fused qkv and does not load: quantize
+    the tower with tools/fn_tower_quantize.py and put the sidecar it writes
+    (vision_tower_exl3.safetensors) in the pack folder, where the loader reads it through its
+    vision_*.safetensors rule. Weights measured on the device at load (63.88 GiB, 2026-10-27); the
+    window is the one it was run at, the estimate above was not run for this pack.'
+  hf_revision: 9c715c0b1a745b7db1c335347e8d45595b3cad3a
+  max_window: 131072
   table:
     gib: 36.36
     policy: cold

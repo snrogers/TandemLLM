@@ -312,6 +312,19 @@
      }
     },
     {
+     "id": "flashnext-unc-4.05",
+     "label": "EXL3 4.05 bpw (Lygodactylus, uncensored)",
+     "weights_gib": 63.88,
+     "drafters_gib": 0.0,
+     "recommended": false,
+     "max_window": 131072,
+     "table": {
+      "gib": 36.36,
+      "policy": "cold",
+      "cache_gib": 2.0
+     }
+    },
+    {
      "id": "flashnext-5.05",
      "label": "EXL3 5.05 bpw (turboderp)",
      "weights_gib": 77.16,
@@ -6718,6 +6731,125 @@
    "selection": {
     "model": "qwen3.8-flash-next",
     "profile": "flashnext-4.05",
+    "window": 262144
+   },
+   "error": {
+    "status": 422,
+    "code": "out_of_range"
+   }
+  },
+  {
+   "name": "Flash-Next flashnext-unc-4.05, window 131,072",
+   "selection": {
+    "model": "qwen3.8-flash-next",
+    "profile": "flashnext-unc-4.05",
+    "window": 131072
+   },
+   "expect": {
+    "contract_version": "1.0",
+    "total_gb": 105.93,
+    "available_gb": null,
+    "device_gb": 121.63,
+    "floor_gb": 15.0,
+    "budget_gb": 106.63,
+    "parts": [
+     {
+      "id": "os",
+      "label": "The OS and other programs",
+      "gb": 10.0,
+      "kind": "fixed"
+     },
+     {
+      "id": "weights",
+      "label": "Weights (EXL3 4.05 bpw (Lygodactylus, uncensored))",
+      "gb": 63.88,
+      "kind": "fixed"
+     },
+     {
+      "id": "engine",
+      "label": "Engine state, the draft layer's buffers, graphs and warm-up",
+      "gb": 5.69,
+      "kind": "fixed"
+     },
+     {
+      "id": "allocator",
+      "label": "Allocator reserve",
+      "gb": 2.3,
+      "kind": "reserve"
+     },
+     {
+      "id": "table",
+      "label": "n-gram row cache (the table read past the page cache)",
+      "gb": 2.0,
+      "kind": "fixed"
+     },
+     {
+      "id": "prefill_workspace",
+      "label": "Prefill workspace (sparse-attention scores, a chunk's activations)",
+      "gb": 9.32,
+      "kind": "reserve"
+     },
+     {
+      "id": "window_buffers",
+      "label": "Warm-up buffers, graphs and the draft layer's cache (they grow with the window)",
+      "gb": 3.93,
+      "kind": "fixed"
+     },
+     {
+      "id": "side_slots",
+      "label": "7 more slot(s), beyond their KV",
+      "gb": 0.0,
+      "kind": "fixed"
+     },
+     {
+      "id": "vision",
+      "label": "Vision",
+      "gb": 0.31,
+      "kind": "reserve",
+      "worst_gb": 0.81
+     },
+     {
+      "id": "prompt_cache",
+      "label": "Conversation cache",
+      "gb": 0.43,
+      "kind": "reserve",
+      "worst_gb": 11.5
+     },
+     {
+      "id": "state_store",
+      "label": "State store",
+      "gb": 0.49,
+      "kind": "reserve",
+      "worst_gb": 2.0
+     },
+     {
+      "id": "kv",
+      "label": "Conversations (KV), committed as they grow",
+      "gb": 7.58,
+      "kind": "kv",
+      "worst_gb": 30.31
+     }
+    ],
+    "fits": true,
+    "fits_worst": false,
+    "context_tokens_fit": 286444,
+    "kv_bytes_per_token": 31040,
+    "typical_fill_tokens": 32768,
+    "kv_worst_gb": 30.31,
+    "room_gb": 8.28,
+    "lane_full_gb": 3.79,
+    "lanes_full": 2,
+    "notes": [
+     "2 of 8 lanes can hold the full 131,072-token window at once (3.79 GiB each); every lane at it would need 22.03 GiB more than there is. Past that the lanes share what is left: a new request waits for memory before it starts, idle conversations give their memory back first, and a lane that would take the box under its floor stops with memory_full; the Chat tab continues it once memory is free.",
+     "About 286,444 tokens of conversation fit in all, 35,805 a lane when all 8 are full (the window is 131,072)."
+    ]
+   }
+  },
+  {
+   "name": "Flash-Next flashnext-unc-4.05, window 262,144",
+   "selection": {
+    "model": "qwen3.8-flash-next",
+    "profile": "flashnext-unc-4.05",
     "window": 262144
    },
    "error": {
