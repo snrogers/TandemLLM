@@ -196,6 +196,7 @@ The branch name says what is inside: `3.05bpw_h5_ng5` is 3.05 bits a weight on a
 |-|-|-|-|-|-|
 | `flashnext-2.05` | `2.05bpw_h4_ng4` | 61.5 GB | 32.85 GiB (estimate) | 24.44 GiB, warm | 262,144 |
 | `flashnext-3.05` (recommended) | `3.05bpw_h5_ng5` | 85.1 GB | 47.87 GiB (measured) | 30.4 GiB, cold | 262,144 |
+| `flashnext-unc-3.05` | `fe57295cac48562c0de8dc5cbf4d7b26c0ebd26d` | 72.4 GB | 47.87 GiB (measured) | 18.48 GiB, cold | 131,072 |
 | `flashnext-4.05` | `4.05bpw_h6_ng6` | 106.1 GB | 62.47 GiB (estimate) | 36.36 GiB, cold | 208,896 |
 | `flashnext-unc-4.05` | `9c715c0b1a745b7db1c335347e8d45595b3cad3a` | 109.1 GB | 63.88 GiB (measured) | 36.36 GiB, cold | 131,072 |
 | `flashnext-5.05` | `5.05bpw_h6_ng6` | 121.9 GB | 77.16 GiB (estimate) | 36.36 GiB, cold | does not load yet |
@@ -208,6 +209,8 @@ The windows come from the Setup Guide's estimate ([setup.md](setup.md)), calibra
 The 4.05, 5.05 and 6.05 branches carry the same n-gram table file (the same sha256), so `ops/fetch_weights.py` hard-links it between packs instead of downloading 39 GB again ([operations.md](operations.md#one-model-at-a-time-the-27b-and-flash-next)).
 
 `flashnext-unc-4.05` is not one of turboderp's packs: it is Lygodactylus's EXL3 pack of orcarouter's abliterated (uncensored) build of the model, a repository of its own at the commit the table names (109.1 GB of files, about 102 GiB on disk). As published it does not load: its vision tower is unquantized (16-bit) with a pre-fused qkv, and the loader builds the tower from EXL3 blocks. `tools/fn_tower_quantize.py` quantizes the tower at 5 bpw, the converter's own uncalibrated treatment for a vision tower, and writes it as one sidecar file, `vision_tower_exl3.safetensors`, in the pack folder; the loader reads it through its `vision_*.safetensors` rule, over the shards, and deleting the sidecar puts the pack back as published. Its window is the one it was run at on a DGX Spark (2026-10-27, its weights measured at load); the estimate was not run for this pack.
+
+`flashnext-unc-3.05` is Lygodactylus's pack of the same abliterated build at 3.05 bpw, a repository of its own at the commit the table names (72.4 GB of files, 68 GB on disk). As published it loads: its vision tower is EXL3 in the shards, in the form the loader builds, so it needs no tower sidecar. Its n-gram table is its own, at 3 bpw like the body (19.84 GB), not one of turboderp's table files. Its window is the one it was run at on a DGX Spark (2026-10-27, its weights measured at load); the estimate was not run for this pack.
 
 ### What a pack holds, and how the engine reads it
 

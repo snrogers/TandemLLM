@@ -70,7 +70,7 @@ def test_the_chapter_is_in_the_manual():
 
 def test_the_pack_tables_match_the_registry_and_profiles():
     profiles = _profiles()
-    assert len(profiles) == 6, [p["id"] for p in profiles]
+    assert len(profiles) == 7, [p["id"] for p in profiles]
     md_rows = [ln for ln in _read("docs", "quantisation.md").splitlines() if ln.startswith("| `flashnext-")]
     tex_rows = [ln for ln in _read("manual", "chapters", "flashnext.tex").splitlines()
                 if ln.startswith("\\code{flashnext-")]
