@@ -62,8 +62,10 @@ DEFAULT_SETTINGS = {
     "tools": [], "packages": [], "packages_blocked": [], "packages_mode": "auto", "mcp": [],
     "prompt_id": None, "policies": {}, "auto_accept_edits": False,
     # model calls a run may make before it stops for Continue: 50 ended the 2026-10-17 pagoda run
-    # (15 files, one or two a call) while it was still fixing its first errors, before any check
-    "max_steps": 100,
+    # (15 files, one or two a call) while it was still fixing its first errors, before any check.
+    # 2026-10-24: the cap was removed at the owner's direction ("no limits"); the value below is a
+    # practical infinity -- the enforcement compares step >= max_steps, so this never fires.
+    "max_steps": 1_000_000_000,
     "sandbox_network": "on", "plan_mode": False,
     # SRV-387/SRV-391: ask | auto | yolo (chatd/tools.py decide_mode); null: the default mode
     # (GET/PUT /permissions/mode), which a new chat copies when it is created
@@ -76,7 +78,7 @@ DEFAULT_SETTINGS = {
     "verify": True,
     # VIS-E15: Agents mode (the main agent plans and gives the file work to workers, chatd/tasks.py),
     # off: today's single loop, byte for byte; a worker's model calls; the tasks one run may give
-    "agents": False, "task_max_steps": 40, "task_max_per_run": 8,
+    "agents": False, "task_max_steps": 1_000_000_000, "task_max_per_run": 1_000_000_000,
 }
 # `max`: a provider's own top level (DeepSeek: low, high, max), offered for its models only
 EFFORTS = ("auto", "low", "medium", "high", "xhigh", "max")
@@ -2030,12 +2032,12 @@ def _clean_settings(patch: dict) -> dict:
     if "effort" in out and out["effort"] not in EFFORTS:
         raise ApiError(400, "bad_request", f"effort must be one of {', '.join(EFFORTS)}")
     if "max_steps" in out:
-        out["max_steps"] = max(1, min(200, int(out["max_steps"] or DEFAULT_SETTINGS["max_steps"])))
+        out["max_steps"] = max(1, min(1_000_000_000, int(out["max_steps"] or DEFAULT_SETTINGS["max_steps"])))
     if "verify" in out:
         out["verify"] = bool(out["verify"])
     if "agents" in out:
         out["agents"] = bool(out["agents"])
-    for k, hi in (("task_max_steps", 200), ("task_max_per_run", 32)):
+    for k, hi in (("task_max_steps", 1_000_000_000), ("task_max_per_run", 1_000_000_000)):
         if k in out:
             out[k] = max(1, min(hi, int(out[k] or DEFAULT_SETTINGS[k])))
     if "permission_mode" in out and out["permission_mode"] not in (None, *tools_mod.MODES):
